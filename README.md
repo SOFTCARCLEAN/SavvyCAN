@@ -116,3 +116,116 @@ signal by juli from the Noun Project
 signal by yudi from the Noun Project
 
 Death by Adrien Coquet from the Noun Project
+
+# Compilation et Exécution de SavvyCAN sur macOS (Apple Silicon - M1/M2)
+
+Ce guide explique comment compiler et exécuter l'application SavvyCAN sur macOS avec une architecture Apple Silicon (M1/M2).
+
+## Pré-requis
+
+Assurez-vous d'avoir installé les outils suivants :
+
+- Xcode (depuis l'App Store)
+- Homebrew (https://brew.sh/)
+
+## Installation des dépendances
+
+1. Installez CMake :
+
+    ```bash
+    brew install cmake
+    ```
+
+2. Installez Qt5 via Homebrew :
+
+    ```bash
+    brew install qt@5
+    ```
+
+Qt5 est installé dans `/opt/homebrew/opt/qt@5`. Étant donné que Qt5 est keg-only, il est nécessaire d'ajouter les chemins à votre environnement.
+
+Ajoutez ces lignes à votre fichier `~/.zshrc` :
+
+    ```bash
+    export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+    export LDFLAGS="-L/opt/homebrew/opt/qt@5/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/qt@5/include"
+    ```
+
+Rechargez la configuration de votre shell :
+
+    ```bash
+    source ~/.zshrc
+    ```
+
+## Compilation
+
+1. Dans le répertoire du projet SavvyCAN, exécutez :
+
+    ```bash
+    /opt/homebrew/opt/qt@5/bin/qmake CONFIG+=sdk_no_version_check
+    ```
+
+Cela permet d'ignorer l'avertissement sur la version du SDK macOS.
+
+2. Compilez le projet :
+
+    ```bash
+    make
+    ```
+
+Si tout se passe bien, cela créera un bundle d'application `SavvyCAN.app`.
+
+## Exécution
+
+1. Pour lancer l'application :
+
+    ```bash
+    open SavvyCAN.app
+    ```
+
+2. Ou pour exécuter le binaire directement :
+
+    ```bash
+    ./SavvyCAN.app/Contents/MacOS/SavvyCAN
+    ```
+
+## Résolution des erreurs fréquentes
+
+### 1. `zsh: no such file or directory: ./SavvyCAN`
+Cela signifie que l'exécutable est contenu dans le bundle d'application. Utilisez la commande suivante :
+
+    ```bash
+    ./SavvyCAN.app/Contents/MacOS/SavvyCAN
+    ```
+
+### 2. `Qt has only been tested with version X of the platform SDK, you're using Y.`
+Ajoutez `CONFIG+=sdk_no_version_check` lors de l'appel à `qmake` :
+
+    ```bash
+    /opt/homebrew/opt/qt@5/bin/qmake CONFIG+=sdk_no_version_check
+    ```
+
+Cela permettra de contourner l'avertissement lié à la version du SDK macOS.
+
+### 3. `Undefined symbols for architecture arm64` lors de l'utilisation de Qt6
+SavvyCAN est conçu pour Qt5. Assurez-vous d'utiliser `qt@5` comme décrit ci-dessus.
+
+## Vérification de la version de Qt utilisée
+
+    ```bash
+    qmake --version
+    ```
+
+Vous devez voir une sortie indiquant quelque chose comme :
+
+    ```
+    QMake version 3.1
+    Using Qt version 5.15.16 in /opt/homebrew/Cellar/qt@5/5.15.16/lib
+    ```
+
+Cela confirme que vous utilisez bien la version Qt5 installée via Homebrew.
+
+
+
+
