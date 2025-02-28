@@ -117,7 +117,7 @@ signal by yudi from the Noun Project
 
 Death by Adrien Coquet from the Noun Project
 
-# Compilation et Exécution de SavvyCAN sur macOS (Apple Silicon - M1/M2)
+# Compilation et Exécution de SavvyCAN sur macOS (Apple Silicon)
 
 Ce guide explique comment compiler et exécuter l'application SavvyCAN sur macOS avec une architecture Apple Silicon (M1/M2).
 
