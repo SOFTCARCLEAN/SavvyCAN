@@ -153,6 +153,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->cbInterpret, &QAbstractButton::toggled, this, &MainWindow::interpretToggled);
     connect(ui->cbOverwrite, &QAbstractButton::toggled, this, &MainWindow::overwriteToggled);
     connect(ui->cbPersistentFilters, &QAbstractButton::toggled, this, &MainWindow::presistentFiltersToggled);
+    //check by default cbPersistentFilters checkbox
+    ui->cbPersistentFilters->setChecked(true);
+    //check by default cbPersistentFilters checkbox
+    ui->cbInterpret->setChecked(true);
     connect(ui->listFilters, &QListWidget::itemChanged, this, &MainWindow::filterListItemChanged);
     connect(ui->listBusFilters, &QListWidget::itemChanged, this, &MainWindow::busFilterListItemChanged);
 
@@ -391,10 +395,14 @@ void MainWindow::readSettings()
         ui->canFramesView->setColumnWidth(7, settings.value("Main/AsciiColumn", 50).toUInt()); //ascii
         //ui->canFramesView->setColumnWidth(8, settings.value("Main/DataColumn", 225).toUInt()); //data
     }
-    if (settings.value("Main/AutoScroll", false).toBool())
+
+    /*
+    if (settings.value("Main/AutoScroll", true).toBool())
     {
         ui->cbAutoScroll->setChecked(true);
     }
+    */
+    ui->cbAutoScroll->setChecked(true);
     int fontSize = settings.value("Main/FontSize", 9).toUInt();
     QFont newFont = QFont(ui->canFramesView->font());
     newFont.setPointSize(fontSize);
