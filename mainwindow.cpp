@@ -153,10 +153,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->cbInterpret, &QAbstractButton::toggled, this, &MainWindow::interpretToggled);
     connect(ui->cbOverwrite, &QAbstractButton::toggled, this, &MainWindow::overwriteToggled);
     connect(ui->cbPersistentFilters, &QAbstractButton::toggled, this, &MainWindow::presistentFiltersToggled);
+    //check by default cbInterpret checkbox
+    ui->cbInterpret->setChecked(true);
+    //check by default cbOverwrite checkbox
+    ui->cbOverwrite->setChecked(true);
     //check by default cbPersistentFilters checkbox
     ui->cbPersistentFilters->setChecked(true);
-    //check by default cbPersistentFilters checkbox
-    ui->cbInterpret->setChecked(true);
+
     connect(ui->listFilters, &QListWidget::itemChanged, this, &MainWindow::filterListItemChanged);
     connect(ui->listBusFilters, &QListWidget::itemChanged, this, &MainWindow::busFilterListItemChanged);
 
@@ -1114,6 +1117,7 @@ void MainWindow::handleLoadFile()
         model->recalcOverwrite();
         ui->lbNumFrames->setText(QString::number(model->rowCount()));
         if (ui->cbAutoScroll->isChecked()) ui->canFramesView->scrollToBottom();
+        expandAllRows(); //Expand all row by default
 
         updateFileStatus();
         emit framesUpdated(-1);
@@ -1158,6 +1162,7 @@ void MainWindow::handleDroppedFile(const QString &filename)
         model->recalcOverwrite();
         ui->lbNumFrames->setText(QString::number(model->rowCount()));
         if (ui->cbAutoScroll->isChecked()) ui->canFramesView->scrollToBottom();
+        expandAllRows(); //Expand all row by default
 
         updateFileStatus();
         emit framesUpdated(-1);
