@@ -18,6 +18,12 @@ TemporalGraphWindow::TemporalGraphWindow(const QVector<CANFrame> *frames, QWidge
     ui(new Ui::TemporalGraphWindow)
 {
     ui->setupUi(this);
+    followGraphEnd = true;  // Active l’auto-scroll au démarrage
+
+    // Todo add a checkbox to enable or not autoscroll
+    /*connect(ui->cbAutoScroll, &QCheckBox::toggled, this, [this](bool checked){
+    followGraphEnd = checked;
+    });*/
 
     setWindowFlags(Qt::Window);
 
