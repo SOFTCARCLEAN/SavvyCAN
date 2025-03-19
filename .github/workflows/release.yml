@@ -28,11 +28,16 @@ jobs:
       - name: Extract version from tag
         id: version
         run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/v}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "Extracted version: ${GITHUB_REF#refs/tags/v}"
 
       - name: Build Installer with Inno Setup
         run: |
           echo "Using version: ${{ env.VERSION }}"
+          if (-not "${{ env.VERSION }}") { 
+            echo "ERROR: VERSION is empty!"
+            exit 1 
+          }
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.VERSION }}" "setup.iss"
 
       - name: Build Project
