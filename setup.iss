@@ -7,7 +7,6 @@ OutputBaseFilename=SavvyCAN_Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-LicenseFile=LICENSE.txt
 
 [Files]
 Source: "SavvyCAN.exe"; DestDir: "{app}"; Flags: ignoreversion
