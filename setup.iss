@@ -27,10 +27,13 @@ WizardStyle=modern
 Source: "bin\SavvyCAN.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\*.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "bin\platforms\*"; DestDir: "{app}\platforms"; Flags: recursesubdirs ignoreversion
-;Source: "bin\plugins\*"; DestDir: "{app}\plugins"; Flags: recursesubdirs ignoreversion
+Source: "bin\bearer\*"; DestDir: "{app}\bearer"; Flags: recursesubdirs ignoreversion
+Source: "bin\canbus\*"; DestDir: "{app}\canbus"; Flags: recursesubdirs ignoreversion
+Source: "bin\iconengines\*"; DestDir: "{app}\iconengines"; Flags: recursesubdirs ignoreversion
+Source: "bin\imageformats\*"; DestDir: "{app}\imageformats"; Flags: recursesubdirs ignoreversion
+Source: "bin\printsupport\*"; DestDir: "{app}\printsupport"; Flags: recursesubdirs ignoreversion
 Source: "bin\translations\*"; DestDir: "{app}\translations"; Flags: recursesubdirs ignoreversion
 Source: "bin\styles\*"; DestDir: "{app}\styles"; Flags: recursesubdirs ignoreversion
-Source: "bin\virtualkeyboard\*"; DestDir: "{app}\virtualkeyboard"; Flags: recursesubdirs ignoreversion
 
 [Icons]
 Name: "{group}\SavvyCAN"; Filename: "{app}\SavvyCAN.exe"
@@ -41,3 +44,5 @@ Filename: "{app}\SavvyCAN.exe"; Description: "Lancer SavvyCAN"; Flags: nowait po
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"
+
+
