@@ -32,7 +32,7 @@ jobs:
 
       - name: Deploy Application with windeployqt
         run: |
-          indeployqt --verbose=2 bin/SavvyCAN.exe
+          windeployqt --verbose=2 bin/SavvyCAN.exe
 
       - name: Extract version from tag
         id: version
