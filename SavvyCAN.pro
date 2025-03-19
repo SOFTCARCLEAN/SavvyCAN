@@ -262,7 +262,15 @@ unix {
 }
 
 windows {
-RC_ICONS=icons/SavvyIcon.ico
+    isEmpty(PREFIX) {
+      PREFIX=/usr/local
+   }
+   target.path = $$PREFIX/bin
+   shortcutfiles.files=SavvyCAN.desktop
+   shortcutfiles.path = $$PREFIX/share/applications
+   INSTALLS += shortcutfiles
+   DISTFILES += SavvyCAN.desktop
+    RC_ICONS=icons/SavvyIcon.ico
 }
 
 examplefiles.files=examples
