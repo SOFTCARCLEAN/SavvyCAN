@@ -176,6 +176,20 @@ Cela permet d'ignorer l'avertissement sur la version du SDK macOS.
 
 Si tout se passe bien, cela créera un bundle d'application `SavvyCAN.app`.
 
+
+## Compilation alternative avec CMake
+
+Si vous préférez utiliser CMake plutôt que qmake, utilisez les commandes suivantes :
+
+```bash
+rm -rf cmake-build-debug
+mkdir cmake-build-debug
+cd cmake-build-debug
+cmake ..
+make
+```
+
+Cela générera le binaire dans le dossier `cmake-build-debug`.
 ## Exécution
 
 1. Pour lancer l'application :
@@ -225,7 +239,5 @@ Vous devez voir une sortie indiquant quelque chose comme :
     ```
 
 Cela confirme que vous utilisez bien la version Qt5 installée via Homebrew.
-
-
 
 
