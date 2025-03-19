@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Installer with Inno Setup
         run: |
-          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=%VERSION% setup.iss
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=$env:VERSION setup.iss
 
       - name: Upload Installer to Release
         uses: softprops/action-gh-release@v1
