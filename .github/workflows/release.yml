@@ -19,7 +19,7 @@ jobs:
           version: '5.15.2'  # ⚠️ Change cette version selon celle que tu utilises
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_mingw'
+          arch: 'win64_mingw81'
           cache: true
 
       - name: Install Inno Setup
