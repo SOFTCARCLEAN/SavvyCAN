@@ -1,0 +1,49 @@
+name: Build and Release Windows Installer
+
+on:
+  push:
+    tags:
+      - 'v*'  # Déclenche le workflow uniquement lorsqu'un tag versionné est poussé
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Qt
+        uses: jurplel/setup-qt-action@v3
+        with:
+          version: '5.15.2'  # ⚠️ Change cette version selon celle que tu utilises
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_mingw'
+          cache: true
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build Project
+        run: |
+          qmake
+          mingw32-make
+
+      - name: Deploy Application with windeployqt
+        run: |
+          windeployqt --release SavvyCAN.exe
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Build Installer with Inno Setup
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=%VERSION% setup.iss
+
+      - name: Upload Installer to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: SavvyCAN_Setup.exe
+          token: ${{ secrets.GITHUB_TOKEN }}
