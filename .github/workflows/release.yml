@@ -41,6 +41,11 @@ jobs:
         run: |
           echo "Version extraite: ${{ env.VERSION }}"
 
+      - name: List files in bin before Inno Setup
+        run: |
+          echo "Listing files in bin/ directory..."
+          Get-ChildItem -Path bin/ -Recurse
+
       - name: Build Installer with Inno Setup
         run: |
           echo "Using version: ${{ env.VERSION }}"
