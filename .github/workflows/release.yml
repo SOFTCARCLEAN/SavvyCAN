@@ -13,14 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Extract version from tag
-        run: echo "VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
-
-      - name: Display version
-        run: |
-          echo "Version extraite: ${{ env.VERSION }}"
-          echo "Version extraite: $env:VERSION"
-
       - name: Setup Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -34,18 +26,11 @@ jobs:
         run: choco install innosetup -y
 
       - name: Extract version from tag
-        id: version
+        run: echo "VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
+
+      - name: Display version
         run: |
-          echo "Extracting version from GITHUB_REF..."
-          echo "GITHUB_REF is: $GITHUB_REF"
-          if ($GITHUB_REF -match "refs/tags/v(.+)") {
-            echo "VERSION=$matches[1]" | Out-File -FilePath $env:GITHUB_ENV -Append
-            echo "Extracted version: $matches[1]"
-          } else {
-            echo "ERROR: No version tag found!"
-            exit 1
-          }
-          echo "Extracted version: ${GITHUB_REF#refs/tags/v}"
+          echo "Version extraite: ${{ env.VERSION }}"
 
       - name: Build Installer with Inno Setup
         run: |
