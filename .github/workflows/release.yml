@@ -25,6 +25,15 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup -y
 
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Build Installer with Inno Setup
+        run: |
+          $version="${{ env.VERSION }}"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=$version" "setup.iss"
+
       - name: Build Project
         run: |
           qmake
@@ -34,13 +43,7 @@ jobs:
         run: |
           windeployqt --verbose=2 bin/SavvyCAN.exe
 
-      - name: Extract version from tag
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      - name: Build Installer with Inno Setup
-        run: |
-          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /DMyAppVersion=$env:VERSION setup.iss
+      
 
       - name: Upload Installer to Release
         uses: softprops/action-gh-release@v1
