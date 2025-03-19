@@ -20,6 +20,8 @@ DEFINES += QCUSTOMPLOT_USE_OPENGL
 TARGET = SavvyCAN
 TEMPLATE = app
 
+DESTDIR = $$PWD/bin
+
 QMAKE_INFO_PLIST = Info.plist.template
 ICON = icons/SavvyIcon.icns
 
@@ -237,7 +239,7 @@ FORMS    += ui/candatagrid.ui \
     ui/helpwindow.ui \
     ui/newconnectiondialog.ui \
     ui/temporalgraphwindow.ui
-    
+
 RESOURCES += \
     icons.qrc \
     images.qrc
@@ -286,4 +288,3 @@ helpfiles.path = $$PREFIX/bin/help
 INSTALLS += helpfiles
 
 INSTALLS += target
-
