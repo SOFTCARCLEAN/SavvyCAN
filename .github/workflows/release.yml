@@ -28,7 +28,15 @@ jobs:
       - name: Extract version from tag
         id: version
         run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          echo "Extracting version from GITHUB_REF..."
+          echo "GITHUB_REF is: $GITHUB_REF"
+          if ($GITHUB_REF -match "refs/tags/v(.+)") {
+            echo "VERSION=$matches[1]" | Out-File -FilePath $env:GITHUB_ENV -Append
+            echo "Extracted version: $matches[1]"
+          } else {
+            echo "ERROR: No version tag found!"
+            exit 1
+          }
           echo "Extracted version: ${GITHUB_REF#refs/tags/v}"
 
       - name: Build Installer with Inno Setup
