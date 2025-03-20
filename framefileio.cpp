@@ -1284,7 +1284,7 @@ bool FrameFileIO::saveCRTDFile(QString filename, const QVector<CANFrame>* frames
     }
 
     //write in float format with 6 digits after the decimal point
-    outFile->write(QString::number(frames->at(0).timeStamp().microSeconds() / 1000000.0, 'f', 6).toUtf8() + tr(" CXX GVRET-PC Reverse Engineering Tool Output V").toUtf8() + QString(VERSION).toUtf8());
+    outFile->write(QString::number(frames->at(0).timeStamp().microSeconds() / 1000000.0, 'f', 6).toUtf8() + tr(" CXX GVRET-PC Reverse Engineering Tool Output ").toUtf8() + QString(VERSION).toUtf8());
     outFile->write("\n");
 
     for (int c = 0; c < frames->count(); c++)
@@ -2851,7 +2851,7 @@ bool FrameFileIO::saveIXXATFile(QString filename, const QVector<CANFrame>* frame
         return false;
     }
 
-    outFile->write("ASCII Trace IXXAT SavvyCAN V" + QString(VERSION).toUtf8() + "\n");
+    outFile->write("ASCII Trace IXXAT SavvyCAN " + QString(VERSION).toUtf8() + "\n");
     outFile->write("Date: " + timestamp.toString("d:M:yyyy").toUtf8() + "\n");
     outFile->write("Start time: " + timestamp.toString("h:m:s").toUtf8() + "\n");
     timestamp = timestamp.addMSecs((frames->last().timeStamp().microSeconds() - frames->first().timeStamp().microSeconds()) / 1000);
