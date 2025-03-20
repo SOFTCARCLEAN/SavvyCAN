@@ -27,10 +27,11 @@ jobs:
       - name: Display version
         run: |
           echo "Version extraite: ${{ env.VERSION }}"
-          
-      - name: Update version in config.h
+
+      - name: Update VERSION in config.h
         run: |
-          sed -i 's/#define VERSION.*/#define VERSION "'"${{ env.VERSION }}"'"/' config.h
+          sed -i 's/#define VERSION.*/#define VERSION "${{ env.VERSION }}"/' config.h
+        shell: bash
 
       - name: Commit updated version
         run: |
