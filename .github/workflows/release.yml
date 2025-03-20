@@ -12,8 +12,14 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout latest commit from master
         uses: actions/checkout@v3
+        with:
+          ref: master  # On force le checkout sur la branche master
+          fetch-depth: 0  # Permet d'avoir l'historique complet des commits pour éviter les conflits
+
+      - name: Display latest commit
+        run: git log --oneline -n 5
 
       - name: Extract version from tag
         run: echo "VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
