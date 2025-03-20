@@ -89,7 +89,7 @@ jobs:
       - name: Package
         run: |
           mkdir package
-          copy "release/SavvyCAN.exe" package/
+          copy "bin/SavvyCAN.exe" package/
           mkdir package/help
           copy  help/*.md package/help/
           mkdir package/help/images
