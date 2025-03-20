@@ -58,5 +58,5 @@ jobs:
       - name: Upload Installer to Release
         uses: softprops/action-gh-release@v1
         with:
-          files: SavvyCAN_Setup.exe
+          files: Output\SavvyCAN_Setup.exe
           token: ${{ secrets.GITHUB_TOKEN }}
