@@ -867,8 +867,10 @@ void MainWindow::overwriteToggled(bool state)
     //     rowExpansionActive = false;
     //     model->setOverwriteMode(false);
     // }
-    if (!state)
-    {
+    if (state) {
+        model->setOverwriteMode(true);
+    }
+    else{
         rowExpansionActive = false;
         model->setOverwriteMode(false);
     }
