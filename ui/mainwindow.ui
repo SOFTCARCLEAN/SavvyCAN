@@ -278,9 +278,6 @@
           <property name="text">
            <string>Interpret Frames</string>
           </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
