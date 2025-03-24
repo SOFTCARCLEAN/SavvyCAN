@@ -40,6 +40,7 @@ bool FrameFileIO::saveFrameFile(QString &fileName, const QVector<CANFrame>* fram
     bool result = false;
 
     QStringList filters;
+    filters.append(QString(tr("CANalyzer Ascii Log (*.asc *.ASC)")));
     filters.append(QString(tr("GVRET Logs (*.csv *.CSV)")));
     filters.append(QString(tr("CRTD Logs (*.crt *.crtd *.CRT *.CRTD)")));
     filters.append(QString(tr("Generic ID/Data CSV (*.csv *.CSV)")));
@@ -51,7 +52,6 @@ bool FrameFileIO::saveFrameFile(QString &fileName, const QVector<CANFrame>* fram
     filters.append(QString(tr("Vehicle Spy (*.csv *.CSV)")));
     filters.append(QString(tr("Candump/Kayak (*.log)")));
     filters.append(QString(tr("Cabana Log (*.csv *.CSV)")));
-    filters.append(QString(tr("CANalyzer Ascii Log (*.asc *.ASC)")));
     filters.append(QString(tr("CARBUS Analyzer (*.trc *.TRC)")));
 
     dialog.setDirectory(settings.value("FileIO/LoadSaveDirectory", dialog.directory().path()).toString());
