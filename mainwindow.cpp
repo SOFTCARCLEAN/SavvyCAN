@@ -192,7 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lbNumFrames->setText("0");
 
     // Prevent annoying accidental horizontal scrolling when filter list is populated with long interpreted message names
-    ui->listFilters->horizontalScrollBar()->setEnabled(false);
+    // ui->listFilters->horizontalScrollBar()->setEnabled(false);
 
     connect(&updateTimer, &QTimer::timeout, this, &MainWindow::tickGUIUpdate);
     updateTimer.setInterval(250);
