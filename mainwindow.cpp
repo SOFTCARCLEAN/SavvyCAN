@@ -826,6 +826,7 @@ void MainWindow::setupSendToLatestGraphWindow()
             param.pointType = 0;
 
             lastGraphingWindow->createGraph(param); //add the new graph to the window
+            lastGraphingWindow->rescaleToData();
         }
         else
         {

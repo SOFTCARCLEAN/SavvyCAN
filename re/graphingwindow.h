@@ -57,6 +57,7 @@ public:
 
 public slots:
     void createGraph(GraphParams &params, bool createGraphParam = true);
+    void rescaleToData(); //Place it in public for auto rescaling when adding a new data in graph
 
 private slots:
     void titleDoubleClick(QMouseEvent *event, QCPTextElement *title);
@@ -77,7 +78,6 @@ private slots:
     void saveDefinitions();
     void loadDefinitions();
     void rescaleAxis(QCPAxis* axis);
-    void rescaleToData();
     void toggleFollowMode();
     void addNewGraph();    
     void appendToGraph(GraphParams &params, CANFrame &frame, QVector<double> &x, QVector<double> &y);
