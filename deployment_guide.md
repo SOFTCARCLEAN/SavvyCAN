@@ -92,3 +92,9 @@
     - Exécuter `bin/SavvyCAN.exe` après déploiement.
     - Vérifier que tous les fichiers nécessaires (DLLs, plugins) sont bien présents.
     - Tester l'installation à partir de `SavvyCAN_Setup.exe`.
+
+
+
+
+https://aqtinstall.readthedocs.io/en/latest/cli.html#list-qt-command
+https://stackoverflow.com/questions/58177786/get-the-current-pushed-tag-in-github-actions
