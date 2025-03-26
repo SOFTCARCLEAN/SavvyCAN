@@ -1614,14 +1614,19 @@ void GraphingWindow::hideGraph(QCPGraph* graph ) //todo function hide
 void GraphingWindow::hideBrackets(QCPGraph* graph, bool visible ) {
     for (int i = 0; i < graphParams.count(); ++i)
     {
+        qDebug() << " count :" << graphParams.count();
         if (graphParams[i].ref == graph)
         {
-            graphParams[i].lastBracket->setVisible(visible);
-            for (QCPItemBracket* bracket : graphParams[i].brackets)
+            qDebug() << " In" ;
+            for (QCPItemBracket* bracket : graphParams[i].brackets) {
                 bracket->setVisible(visible);
+                qDebug() << " bracket" << bracket->visible();
+            }
 
-            for (auto* text : graphParams[i].bracketTexts)
+            for (auto* text : graphParams[i].bracketTexts) {
                 text->setVisible(visible);
+                qDebug() << " text" << text->visible();
+            }
 
         }
     }
