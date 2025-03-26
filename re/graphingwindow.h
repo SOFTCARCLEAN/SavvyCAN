@@ -72,6 +72,8 @@ private slots:
     void removeSelectedGraph();
     void removeAllGraphs();
     void contextMenuRequest(QPoint pos);
+    void hideGraph(QCPGraph* graph );
+    void hideBrackets(QCPGraph* graph, bool visible);
     void moveLegend();
     void saveGraphs();
     void saveSpreadsheet();

@@ -657,8 +657,55 @@ void GraphingWindow::contextMenuRequest(QPoint pos)
   QMenu *menu = new QMenu(this);
   menu->setAttribute(Qt::WA_DeleteOnClose);
 
+    QCPAbstractLegendItem *clickedItem = nullptr;
+
+    for (int row = 0; row < ui->graphingView->legend->elementCount(); ++row)
+    {
+        QCPLayoutElement *el = ui->graphingView->legend->elementAt(row);
+        if (!el) continue;
+
+        QCPAbstractLegendItem *testItem = qobject_cast<QCPAbstractLegendItem *>(el);
+        if (testItem && testItem->selectTest(pos, false) >= 0)
+        {
+            clickedItem = testItem;
+            break;
+        }
+
+        if (clickedItem) break;
+    }
+
   if (ui->graphingView->legend->selectTest(pos, false) >= 0) // context menu on legend requested
   {
+      QCPPlottableLegendItem *plItem = qobject_cast<QCPPlottableLegendItem *>(clickedItem);
+      if (plItem) {
+          QCPGraph *graph = qobject_cast<QCPGraph *>(plItem->plottable());
+          QString graphLabel = graph->visible() ? tr("hide graph") : tr("Show graph");
+          QAction* hideGraphAction = menu->addAction(graphLabel);
+          connect(hideGraphAction, &QAction::triggered, this, [this, graph]() {
+              hideGraph(graph);
+          });
+
+          bool bracketsVisible = false;
+          for (int i = 0; i < graphParams.count(); ++i)
+          {
+              if (graphParams[i].ref == graph)
+              {
+                  for (QCPItemBracket* bracket : graphParams[i].brackets) {
+                      if (bracket->visible()) {
+                          bracketsVisible = true;
+                      }
+                  }
+
+              }
+          }
+
+          QString bracketsLabel = bracketsVisible ? tr("hide brackets") : tr("Show brackets");
+          QAction* hideBracketsAction = menu->addAction(bracketsLabel);
+          connect(hideBracketsAction, &QAction::triggered, this, [this, graph, bracketsVisible]() {
+              hideBrackets(graph, !bracketsVisible);
+          });
+      }
+
     menu->addAction(tr("Move to top left"), this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignLeft));
     menu->addAction(tr("Move to top center"), this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignHCenter));
     menu->addAction(tr("Move to top right"), this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignRight));
@@ -1462,6 +1509,8 @@ void GraphingWindow::createGraph(GraphParams &params, bool createGraphParam)
         valueText->setPositionAlignment(Qt::AlignBottom|Qt::AlignHCenter);
         valueText->setText(params.prevValStr);
         valueText->setFont(QFont(font().family(), 10));
+        params.bracketTexts.append(valueText);
+        params.brackets.append(bracket);
         params.prevValLocation = QPointF(x, y);
         params.prevValStr = tempStr;
         params.prevValTable = tempVal;
@@ -1548,6 +1597,36 @@ void GraphingWindow::createGraph(GraphParams &params, bool createGraphParam)
     ui->graphingView->yAxis->setRange(yminval, ymaxval);
 
     ui->graphingView->replot();
+}
+
+void GraphingWindow::hideGraph(QCPGraph* graph ) //todo function hide
+{
+    qDebug() << "Graph under right-clicked legend:" << graph->name();
+    bool visible = !graph->visible();
+    hideBrackets(graph, visible);
+
+    graph->setVisible(visible);
+
+    ui->graphingView->replot();
+    rescaleToData();
+}
+
+void GraphingWindow::hideBrackets(QCPGraph* graph, bool visible ) {
+    for (int i = 0; i < graphParams.count(); ++i)
+    {
+        if (graphParams[i].ref == graph)
+        {
+            graphParams[i].lastBracket->setVisible(visible);
+            for (QCPItemBracket* bracket : graphParams[i].brackets)
+                bracket->setVisible(visible);
+
+            for (auto* text : graphParams[i].bracketTexts)
+                text->setVisible(visible);
+
+        }
+    }
+    ui->graphingView->replot();
+    rescaleToData();
 }
 
 void GraphingWindow::moveLegend()
