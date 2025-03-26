@@ -642,8 +642,30 @@ void GraphingWindow::rescaleAxis(QCPAxis *axis)
 
 void GraphingWindow::rescaleToData()
 {
-    this->rescaleAxis(ui->graphingView->xAxis);
-    this->rescaleAxis(ui->graphingView->yAxis);
+    const double marginRatio = 0.05; // 5% de marge
+
+    QCPRange xRange = ui->graphingView->xAxis->range();
+    QCPRange yRange = ui->graphingView->yAxis->range();
+
+    // Rescale to fit all visible plottables
+    ui->graphingView->xAxis->rescale(true);
+    ui->graphingView->yAxis->rescale(true);
+
+    // Ajouter une marge aux nouvelles plages
+    xRange = ui->graphingView->xAxis->range();
+    yRange = ui->graphingView->yAxis->range();
+
+    double xMargin = xRange.size() * marginRatio;
+    double yMargin = yRange.size() * marginRatio;
+
+    xRange.lower -= xMargin;
+    xRange.upper += xMargin;
+    yRange.lower -= yMargin;
+    yRange.upper += yMargin;
+
+    ui->graphingView->xAxis->setRange(xRange);
+    ui->graphingView->yAxis->setRange(yRange);
+
     ui->graphingView->replot();
 }
 
