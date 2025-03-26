@@ -399,13 +399,10 @@ void MainWindow::readSettings()
         //ui->canFramesView->setColumnWidth(8, settings.value("Main/DataColumn", 225).toUInt()); //data
     }
 
-    /*
     if (settings.value("Main/AutoScroll", true).toBool())
     {
         ui->cbAutoScroll->setChecked(true);
     }
-    */
-    ui->cbAutoScroll->setChecked(true);
     int fontSize = settings.value("Main/FontSize", 9).toUInt();
     QFont newFont = QFont(ui->canFramesView->font());
     newFont.setPointSize(fontSize);
