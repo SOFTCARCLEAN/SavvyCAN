@@ -1621,7 +1621,7 @@ void GraphingWindow::createGraph(GraphParams &params, bool createGraphParam)
     ui->graphingView->replot();
 }
 
-void GraphingWindow::hideGraph(QCPGraph* graph ) //todo function hide
+void GraphingWindow::hideGraph(QCPGraph* graph )
 {
     qDebug() << "Graph under right-clicked legend:" << graph->name();
     bool visible = !graph->visible();
