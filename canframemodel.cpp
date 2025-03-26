@@ -392,6 +392,7 @@ void CANFrameModel::recalcOverwrite()
             filteredFrames.append(frames[i]);
         }
     }*/
+    qSortCANFrameAsc(&filteredFrames, Column(1), 0, filteredFrames.count()-1); // Sort By ID ASC
 
     endResetModel();
     mutex.unlock();
