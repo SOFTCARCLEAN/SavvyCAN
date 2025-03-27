@@ -5,7 +5,7 @@
 #define MyAppAssocName MyAppName + " File"
 #define MyAppAssocExt ".exe"
 #define MyAppAssocKey StringChange(MyAppAssocName, " ", "") + MyAppAssocExt
-
+#define MyAppVersion GetEnv("MyAppVersion")
 
 [Setup]
 AppId={{3B2BD357-55C7-4B11-AEEE-D8C61D8B87BC}
