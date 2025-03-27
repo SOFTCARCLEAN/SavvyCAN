@@ -1,7 +1,7 @@
 #ifndef CONFIG
 #define CONFIG
 
-#define VERSION "v1.0.1"
+#define VERSION "v1.0.2"
 
 //try to keep this in sync.
 //SavvyCAN will complain if you connect a GVRET board with a revision
