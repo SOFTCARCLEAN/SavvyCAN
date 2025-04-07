@@ -74,69 +74,70 @@ bool FrameFileIO::saveFrameFile(QString &fileName, const QVector<CANFrame>* fram
 
         qApp->processEvents();
 
-        if (dialog.selectedNameFilter() == filters[0])
+        if(dialog.selectedNameFilter() == filters[0])
+        {
+            if (!filename.contains('.')) filename += ".asc";
+            result = saveCanalyzerASC(filename, frameCache);
+        }
+
+        if (dialog.selectedNameFilter() == filters[1])
         {
             if (!filename.contains('.')) filename += ".csv";
             result = saveNativeCSVFile(filename, frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[1])
+        if (dialog.selectedNameFilter() == filters[2])
         {
             if (!filename.contains('.')) filename += ".txt";
             result = saveCRTDFile(filename, frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[2])
+        if (dialog.selectedNameFilter() == filters[3])
         {
             if (!filename.contains('.')) filename += ".csv";
             result = saveGenericCSVFile(filename, frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[3])
+        if (dialog.selectedNameFilter() == filters[4])
         {
             if (!filename.contains('.')) filename += ".log";
             result = saveLogFile(filename, frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[4])
+        if (dialog.selectedNameFilter() == filters[5])
         {
             if (!filename.contains('.')) filename += ".log";
             result = saveMicrochipFile(filename, frameCache);
         }
 
-        if (dialog.selectedNameFilter() == filters[5])
+        if (dialog.selectedNameFilter() == filters[6])
         {
             if (!filename.contains('.')) filename += ".trace";
             result = saveTraceFile(filename, frameCache);
         }
 
-        if (dialog.selectedNameFilter() == filters[6])
+        if (dialog.selectedNameFilter() == filters[7])
         {
             if (!filename.contains('.')) filename += ".csv";
             result = saveIXXATFile(filename, frameCache);
         }
 
-        if (dialog.selectedNameFilter() == filters[7])
+        if (dialog.selectedNameFilter() == filters[8])
         {
             if (!filename.contains('.')) filename += ".can";
             result = saveCANDOFile(filename, frameCache);
         }
 
-        if (dialog.selectedNameFilter() == filters[8])
+        if (dialog.selectedNameFilter() == filters[9])
         {
             if (!filename.contains('.')) filename += ".csv";
             result = saveVehicleSpyFile(filename, frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[9])
+        if (dialog.selectedNameFilter() == filters[10])
         {
             if (!filename.contains('.')) filename += ".log";
             saveCanDumpFile(filename,frameCache);
         }
-        if (dialog.selectedNameFilter() == filters[10])
+        if (dialog.selectedNameFilter() == filters[11])
         {
             if (!filename.contains('.')) filename += ".csv";
             result = saveCabanaFile(filename, frameCache);
-        }
-        if (dialog.selectedNameFilter() == filters[11])
-        {
-            if (!filename.contains('.')) filename += ".asc";
-            result = saveCanalyzerASC(filename, frameCache);
         }
         if (dialog.selectedNameFilter() == filters[12])
         {
