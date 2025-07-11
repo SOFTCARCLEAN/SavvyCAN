@@ -24,8 +24,7 @@ jobs:
         run: |
           TODAY=$(date +'%y.%m.%d')
           COUNT=$(git tag --list "v${TODAY}.*" | wc -l)
-          COUNT=$((COUNT+1))
-          TAG="${TODAY}-${COUNT-1}"
+          TAG="${TODAY}-${COUNT}"
           echo "Generated TAG: $TAG"
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "tag=$TAG" >> $GITHUB_OUTPUT
