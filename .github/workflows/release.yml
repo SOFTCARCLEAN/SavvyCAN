@@ -1,4 +1,4 @@
-name: Build and Release Windows Installer
+name: Build and Release Installer
 
 on:
   push:
@@ -9,34 +9,29 @@ permissions:
   contents: write
 
 jobs:
-  build-windows:
-    if: github.event.head_commit.author.name != 'github-actions[bot]'
-    runs-on: windows-latest
-    permissions:
-      contents: write
-
+  prepare-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set-version.outputs.tag }}
     steps:
-      - name: Checkout latest commit from master
+      - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: master  # On force le checkout sur la branche master
-          fetch-depth: 0  # Permet d'avoir l'historique complet des commits pour éviter les conflits
+          fetch-depth: 0
 
-      - name: Display latest commit
-        run: git log --oneline -n 5
-
-      - name: Generate tag name
-        id: tag
-        run: echo "TAG=$(date +'%y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
-
-      - name: Display version
+      - name: Generate daily incremental tag
+        id: set-version
         run: |
-          echo "Version extraite: ${{ env.TAG }}"
+          TODAY=$(date +'%y.%m.%d')
+          COUNT=$(git tag --list "${TODAY}.*" | wc -l)
+          COUNT=$((COUNT+1))
+          TAG="${TODAY}-${COUNT}"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          echo "::set-output name=tag::$TAG"
 
       - name: Update VERSION in config.h
         run: |
           sed -i 's/#define VERSION.*/#define VERSION "${{ env.TAG }}"/' config.h
-        shell: bash
 
       - name: Commit updated version
         run: |
@@ -46,10 +41,19 @@ jobs:
           git commit -m "Update version to ${{ env.TAG }}"
           git push
 
+  build-windows:
+    needs: prepare-version
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Setup Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '5.15.2'  # ⚠️ Change cette version selon celle que tu utilises
+          version: '5.15.2'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_mingw81'
@@ -64,28 +68,33 @@ jobs:
           mingw32-make
 
       - name: Deploy Application with windeployqt
-        run: |
-          windeployqt --verbose=2 bin/SavvyCAN.exe
-
-      - name: List files in bin before Inno Setup
-        run: |
-          echo "Listing files in bin/ directory..."
-          Get-ChildItem -Path bin/ -Recurse
+        run: windeployqt --verbose=2 bin/SavvyCAN.exe
 
       - name: Build Installer with Inno Setup
         run: |
-          echo "Using version: ${{ env.TAG }}"
-          if (-not "${{ env.TAG }}") { 
-            echo "ERROR: VERSION is empty!"
-            exit 1 
-          }
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.TAG }}" "setup.iss"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ needs.prepare-version.outputs.version }}" "setup.iss"
 
-      - name: Upload Installer to Release
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SavvyCAN-installer
+          path: ./Output/SavvyCAN_${{ needs.prepare-version.outputs.version }}_Setup.exe
+
+  create-release:
+    needs: build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download installer artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: SavvyCAN-installer
+          path: ./release/
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v${{ env.TAG }}"
-          name: "Release v${{ env.TAG }}"
-          files: ./Output/SavvyCAN_${{ env.TAG }}_Setup.exe
+          tag_name: "v${{ needs.prepare-version.outputs.version }}"
+          name: "Release v${{ needs.prepare-version.outputs.version }}"
+          files: ./release/*
