@@ -2,11 +2,15 @@ name: Build and Release Windows Installer
 
 on:
   push:
-    tags:
-      - 'v*'  # Déclenche le workflow uniquement lorsqu'un tag versionné est poussé
+    branches: [ main, master, ci-test ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-windows:
+    if: github.event.head_commit.author.name != 'github-actions[bot]'
     runs-on: windows-latest
     permissions:
       contents: write
@@ -21,16 +25,17 @@ jobs:
       - name: Display latest commit
         run: git log --oneline -n 5
 
-      - name: Extract version from tag
-        run: echo "VERSION=${{ github.ref_name }}" >> $env:GITHUB_ENV
+      - name: Generate tag name
+        id: tag
+        run: echo "TAG=$(date +'%y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Display version
         run: |
-          echo "Version extraite: ${{ env.VERSION }}"
+          echo "Version extraite: ${{ env.TAG }}"
 
       - name: Update VERSION in config.h
         run: |
-          sed -i 's/#define VERSION.*/#define VERSION "${{ env.VERSION }}"/' config.h
+          sed -i 's/#define VERSION.*/#define VERSION "${{ env.TAG }}"/' config.h
         shell: bash
 
       - name: Commit updated version
@@ -38,7 +43,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add config.h
-          git commit -m "Update version to ${{ env.VERSION }}"
+          git commit -m "Update version to ${{ env.TAG }}"
           git push
 
       - name: Setup Qt
@@ -69,15 +74,18 @@ jobs:
 
       - name: Build Installer with Inno Setup
         run: |
-          echo "Using version: ${{ env.VERSION }}"
-          if (-not "${{ env.VERSION }}") { 
+          echo "Using version: ${{ env.TAG }}"
+          if (-not "${{ env.TAG }}") { 
             echo "ERROR: VERSION is empty!"
             exit 1 
           }
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.VERSION }}" "setup.iss"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ env.TAG }}" "setup.iss"
 
       - name: Upload Installer to Release
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ./Output/SavvyCAN_${{ env.VERSION }}_Setup.exe
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: "v${{ env.TAG }}"
+          name: "Release v${{ env.TAG }}"
+          files: ./Output/SavvyCAN_${{ env.TAG }}_Setup.exe
