@@ -25,9 +25,9 @@ jobs:
           TODAY=$(date +'%y.%m.%d')
           COUNT=$(git tag --list "${TODAY}.*" | wc -l)
           COUNT=$((COUNT+1))
-          TAG="${TODAY}-${COUNT}"
+          TAG="${TODAY}-${COUNT-1}"
           echo "TAG=$TAG" >> $GITHUB_ENV
-          echo "::set-output name=tag::$TAG"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Update VERSION in config.h
         run: |
@@ -75,7 +75,7 @@ jobs:
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ needs.prepare-version.outputs.version }}" "setup.iss"
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SavvyCAN-installer
           path: ./Output/SavvyCAN_${{ needs.prepare-version.outputs.version }}_Setup.exe
