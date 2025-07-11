@@ -23,7 +23,12 @@ jobs:
         id: set-version
         run: |
           TODAY=$(date +'%y.%m.%d')
-          COUNT=$(git tag --list "v${TODAY}.*" | wc -l)
+          LAST=$(git tag --list "v${TODAY}-*" | sed -E "s/v${TODAY}-([0-9]+)/\1/" | sort -n | tail -1)
+          if [ -z "$LAST" ]; then
+            COUNT=0
+          else
+            COUNT=$((LAST + 1))
+          fi
           TAG="${TODAY}-${COUNT}"
           echo "Generated TAG: $TAG"
           echo "TAG=$TAG" >> $GITHUB_ENV
