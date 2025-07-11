@@ -26,6 +26,7 @@ jobs:
           COUNT=$(git tag --list "v${TODAY}.*" | wc -l)
           COUNT=$((COUNT+1))
           TAG="${TODAY}-${COUNT-1}"
+          echo "Generated TAG: $TAG"
           echo "TAG=$TAG" >> $GITHUB_ENV
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
@@ -81,7 +82,7 @@ jobs:
           path: ./Output/SavvyCAN_${{ needs.prepare-version.outputs.version }}_Setup.exe
 
   create-release:
-    needs: build-windows
+    needs: [ prepare-version, build-windows ]
     runs-on: ubuntu-latest
     steps:
       - name: Download installer artifact
@@ -92,10 +93,8 @@ jobs:
 
       - name: Generate daily incremental tag
         run: |
-          echo "v${{ needs.prepare-version.outputs.version }}" >> $GITHUB_ENV
-          echo "v${{ needs.prepare-version.outputs.version }}" >> $GITHUB_OUTPUT
-          echo "v${{ needs.prepare-version.outputs.tag }}" >> $GITHUB_ENV
-          echo "v${{ needs.prepare-version.outputs.tag }}" >> $GITHUB_OUTPUT
+          echo "v${{ needs.prepare-version.outputs.version }}"
+          echo "v${{ needs.prepare-version.outputs.tag }}"
 
 
       - name: Create GitHub Release
