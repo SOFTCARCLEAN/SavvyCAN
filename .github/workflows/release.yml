@@ -23,7 +23,7 @@ jobs:
         id: set-version
         run: |
           TODAY=$(date +'%y.%m.%d')
-          COUNT=$(git tag --list "${TODAY}.*" | wc -l)
+          COUNT=$(git tag --list "v${TODAY}.*" | wc -l)
           COUNT=$((COUNT+1))
           TAG="${TODAY}-${COUNT-1}"
           echo "TAG=$TAG" >> $GITHUB_ENV
@@ -89,6 +89,14 @@ jobs:
         with:
           name: SavvyCAN-installer
           path: ./release/
+
+      - name: Generate daily incremental tag
+        run: |
+          echo "v${{ needs.prepare-version.outputs.version }}" >> $GITHUB_ENV
+          echo "v${{ needs.prepare-version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "v${{ needs.prepare-version.outputs.tag }}" >> $GITHUB_ENV
+          echo "v${{ needs.prepare-version.outputs.tag }}" >> $GITHUB_OUTPUT
+
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
