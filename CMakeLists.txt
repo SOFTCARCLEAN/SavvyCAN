@@ -8,7 +8,18 @@ set(Qt5_DIR "/opt/homebrew/opt/qt@5/lib/cmake/Qt5")
 
 # Trouver Qt5 et ses modules
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets SerialPort SerialBus Qml Test PrintSupport)
+#set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)  # Indique où chercher les fichiers .ui
 
+# Force AUTOMOC et AUTOUIC à être actifs
+#set(CMAKE_AUTOMOC ON)
+#set(CMAKE_AUTOUIC ON)
+#set(CMAKE_AUTORCC ON)
+
+# Placer les fichiers générés par moc/uic/rcc dans le dossier source (comme le ferait qmake)
+#set(CMAKE_AUTOGEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR})
+
+# Ajoute le dossier source à l'include path pour trouver les ui_*.h générés
+#include_directories(${CMAKE_SOURCE_DIR})
 # Récupérer tous les fichiers .cpp
 file(GLOB_RECURSE PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/*.cpp)
 
@@ -36,7 +47,7 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/dbc  # Ajouter d'autres si besoin
 )
 
-qt5_wrap_ui(UI_HEADERS mainwindow.ui)
+qt5_wrap_ui(UI_HEADERS ui/mainwindow.ui)
 
 # Définir le dossier de sortie pour l'exécutable
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
