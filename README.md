@@ -181,36 +181,61 @@ Si tout se passe bien, cela créera un bundle d'application `SavvyCAN.app`.
 
 Si vous préférez utiliser CMake plutôt que qmake, utilisez les commandes suivantes :
 
-```bash
-rm -rf cmake-build-debug
-mkdir cmake-build-debug
-cd cmake-build-debug
-cmake ..
-make
-```
+   ```bash
+      rm -rf cmake-build-debug
+      mkdir cmake-build-debug
+      cd cmake-build-debug
+      cmake ..
+      make
+   ```
 
 Cela générera le binaire dans le dossier `cmake-build-debug`.
+
+## Génération des fichiers de compilation :
+  ```bash
+     cmake ..
+     make -j$(sysctl -n hw.ncpu)
+  ```
+
+
 ## Exécution
 
 1. Pour lancer l'application :
 
     ```bash
-    open SavvyCAN.app
+   cd ../
+   open SavvyCAN.app
     ```
 
 2. Ou pour exécuter le binaire directement :
 
-    ```bash
-    cd ../ 
+    ```bash 
     bin/SavvyCAN 
 
     ```
 
+# SavvyCAN - Build & Run
+
+## 📦 Build rapide
+
+Tout est configuré pour que les fichiers générés (build system, moc, uic, binaires) aillent dans le dossier `build/` pour garder un projet propre.
+
+### 🔧 Compilation & exécution
+
+   ```bash
+      ./scripts/rebuild.sh
+   ```
+
+### Activer le script
+   ```bash
+      chmod +x scripts/rebuild.sh
+   ```
+
+
 ## Résolution des erreurs fréquentes
 
-### 1. `zsh: no such file or directory: ./SavvyCAN`
+### 1. zsh: no such file or directory: ./SavvyCAN
 Cela signifie que l'exécutable est contenu dans le bundle d'application. Utilisez la commande suivante :
-
     ```bash
     ./SavvyCAN.app/Contents/MacOS/SavvyCAN
     ```

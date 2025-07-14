@@ -8,52 +8,73 @@ set(Qt5_DIR "/opt/homebrew/opt/qt@5/lib/cmake/Qt5")
 
 # Trouver Qt5 et ses modules
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets SerialPort SerialBus Qml Test PrintSupport)
-#set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)  # Indique où chercher les fichiers .ui
 
-# Force AUTOMOC et AUTOUIC à être actifs
-#set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTOUIC ON)
-#set(CMAKE_AUTORCC ON)
+# Activer l'autogénération pour Qt
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
-# Placer les fichiers générés par moc/uic/rcc dans le dossier source (comme le ferait qmake)
-#set(CMAKE_AUTOGEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR})
+# Indiquer où chercher les fichiers .ui
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
 
-# Ajoute le dossier source à l'include path pour trouver les ui_*.h générés
-#include_directories(${CMAKE_SOURCE_DIR})
-# Récupérer tous les fichiers .cpp
-file(GLOB_RECURSE PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/*.cpp)
+# Pour la sortie dans bin/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_AUTOGEN_BUILD_DIR ${CMAKE_BINARY_DIR}/autogen)
+set(CMAKE_AUTOUIC_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/autogen/ui)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# Exclure les fichiers dans "test/"
-foreach(source ${PROJECT_SOURCES})
-    string(FIND ${source} "/test/" found_test)
-    if (NOT found_test EQUAL -1)
-        list(REMOVE_ITEM PROJECT_SOURCES ${source})
-    endif()
-endforeach()
-
-# Exclure les fichiers CMakeCXXCompilerId
-foreach(source ${PROJECT_SOURCES})
-    string(FIND ${source} "CMakeCXXCompilerId.cpp" found_compiler_id)
-    if (NOT found_compiler_id EQUAL -1)
-        list(REMOVE_ITEM PROJECT_SOURCES ${source})
-    endif()
-endforeach()
-
-message(STATUS "Final source files: ${PROJECT_SOURCES}")
-
-# Ajouter les dossiers contenant les headers
-include_directories(
-        ${CMAKE_SOURCE_DIR}  # Racine du projet
-        ${CMAKE_SOURCE_DIR}/dbc  # Ajouter d'autres si besoin
+# Récupérer tous les fichiers source
+file(GLOB_RECURSE PROJECT_SOURCES
+        ${CMAKE_SOURCE_DIR}/*.cpp
+#        ${CMAKE_SOURCE_DIR}/*.h
+        ${CMAKE_SOURCE_DIR}/ui/*.ui
 )
 
-qt5_wrap_ui(UI_HEADERS ui/mainwindow.ui)
+# Filtrer pour exclure test ou cmake
+foreach(source ${PROJECT_SOURCES})
+    string(FIND ${source} "/test/" found_test)
+    string(FIND ${source} "CMakeCXXCompilerId.cpp" found_compiler_id)
+    if (NOT found_test EQUAL -1 OR NOT found_compiler_id EQUAL -1)
+        list(REMOVE_ITEM PROJECT_SOURCES ${source})
+    endif()
+endforeach()
 
-# Définir le dossier de sortie pour l'exécutable
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+# Exclure explicitement les anciens moc_*.cpp
+foreach(source ${PROJECT_SOURCES})
+    string(FIND ${source} "/moc_" found_moc)
+    if (NOT found_moc EQUAL -1)
+        list(REMOVE_ITEM PROJECT_SOURCES ${source})
+    endif()
+endforeach()
 
-# Ajouter l'exécutable
-add_executable(SavvyCAN ${PROJECT_SOURCES} ${UI_HEADERS})
+message(STATUS "Source files: ${PROJECT_SOURCES}")
 
-# Lier Qt5 aux bibliothèques
-target_link_libraries(SavvyCAN Qt5::Core Qt5::Gui Qt5::Widgets Qt5::SerialPort Qt5::SerialBus Qt5::Qml Qt5::Test Qt5::PrintSupport)
+# Créer l'exécutable
+add_executable(SavvyCAN ${PROJECT_SOURCES})
+
+# Inclure pour le moc
+file(GLOB_RECURSE QMQTT_HEADERS
+        ${CMAKE_SOURCE_DIR}/mqtt/*.h
+        ${CMAKE_SOURCE_DIR}/mqtt/*.p.h
+)
+target_sources(SavvyCAN PRIVATE ${QMQTT_HEADERS})
+
+target_include_directories(SavvyCAN PRIVATE
+        ${CMAKE_SOURCE_DIR}
+        ${CMAKE_SOURCE_DIR}/dbc
+        ${CMAKE_SOURCE_DIR}/connections
+        ${CMAKE_SOURCE_DIR}/bus_protocols
+        ${CMAKE_SOURCE_DIR}/re
+)
+# Lier Qt
+target_link_libraries(SavvyCAN
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
+        Qt5::SerialPort
+        Qt5::SerialBus
+        Qt5::Qml
+        Qt5::Test
+        Qt5::PrintSupport
+)
