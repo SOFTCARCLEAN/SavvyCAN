@@ -201,7 +201,8 @@ Cela générera le binaire dans le dossier `cmake-build-debug`.
 2. Ou pour exécuter le binaire directement :
 
     ```bash
-    ./SavvyCAN.app/Contents/MacOS/SavvyCAN
+    bin/SavvyCAN.app/Contents/MacOS/SavvyCAN 
+
     ```
 
 ## Résolution des erreurs fréquentes
