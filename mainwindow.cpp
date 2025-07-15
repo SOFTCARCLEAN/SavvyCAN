@@ -152,13 +152,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->cbInterpret, &QAbstractButton::toggled, this, &MainWindow::interpretToggled);
     connect(ui->cbOverwrite, &QAbstractButton::toggled, this, &MainWindow::overwriteToggled);
-    connect(ui->cbPersistentFilters, &QAbstractButton::toggled, this, &MainWindow::presistentFiltersToggled);
+    connect(ui->cbPersistentFilters, &QAbstractButton::toggled, this, &MainWindow::persistentFiltersToggled);
     //check by default cbInterpret checkbox
     ui->cbInterpret->setChecked(true);
+    interpretToggled(ui->cbInterpret->isChecked());
     //check by default cbOverwrite checkbox
     ui->cbOverwrite->setChecked(true);
+    overwriteToggled(ui->cbOverwrite->isChecked());
     //check by default cbPersistentFilters checkbox
     ui->cbPersistentFilters->setChecked(true);
+    persistentFiltersToggled(ui->cbPersistentFilters->isChecked());
 
     connect(ui->listFilters, &QListWidget::itemChanged, this, &MainWindow::filterListItemChanged);
     connect(ui->listBusFilters, &QListWidget::itemChanged, this, &MainWindow::busFilterListItemChanged);
@@ -843,12 +846,14 @@ void MainWindow::setupSendToLatestGraphWindow()
 }
 void MainWindow::interpretToggled(bool state)
 {
+    qDebug() << "Interpret Toggled:" << (state ? "true" : "false");
     model->setInterpretMode(state);
     //ui->canFramesView->resizeRowsToContents();   //a VERY costly operation!
 }
 
 void MainWindow::overwriteToggled(bool state)
 {
+    qDebug() << "Overwrite Toggled:" << (state ? "true" : "false");
     // if (state)
     // {
     //     QMessageBox::StandardButton confirmDialog;
@@ -874,8 +879,9 @@ void MainWindow::overwriteToggled(bool state)
     }
 }
 
-void MainWindow::presistentFiltersToggled(bool state)
+void MainWindow::persistentFiltersToggled(bool state)
 {
+    qDebug() << "Presistent Filters Toggled:" << (state ? "true" : "false");
     if (state)
     {
         model->setClearMode(true);
