@@ -445,9 +445,7 @@ void MainWindow::readUpdateableSettings()
 
     CSVAbsTime = settings.value("Main/CSVAbsTime", false).toBool();
 
-    if (settings.value("Main/FilterLabeling", false).toBool())
-        ui->listFilters->setMaximumWidth(250);
-    else
+    if (!settings.value("Main/FilterLabeling", false).toBool())
         ui->listFilters->setMaximumWidth(175);
     updateFilterList();    
 }    
