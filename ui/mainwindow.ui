@@ -416,11 +416,6 @@
               <height>16777215</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
             <property name="accessibleDescription">
              <string/>
             </property>
