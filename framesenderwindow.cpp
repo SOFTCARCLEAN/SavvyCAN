@@ -546,7 +546,7 @@ void FrameSenderWindow::handleTick()
             for (int j = 0; j < sendData->triggers.count(); j++)
             {
                 trigger = &sendData->triggers[j];
-                if (trigger->currCount >= trigger->maxCount) continue; //don't process if we've sent max frames we were supposed to
+                // if (trigger->currCount >= trigger->maxCount) continue; //don't process if we've sent max frames we were supposed to // todo add the check when max count functionality will work
                 if (!trigger->readyCount) continue; //don't tick if not ready to tick
                 //is it time to fire?
                 trigger->msCounter += elapsed; //gives proper tracking even if timer doesn't fire as fast as it should
