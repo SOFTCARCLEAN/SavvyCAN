@@ -187,6 +187,8 @@ Si vous préférez utiliser CMake plutôt que qmake, utilisez les commandes suiv
       cd cmake-build-debug
       cmake ..
       make
+      cd ../
+      bin/SavvyCAN
    ```
 
 Cela générera le binaire dans le dossier `cmake-build-debug`.
@@ -268,3 +270,41 @@ Vous devez voir une sortie indiquant quelque chose comme :
 Cela confirme que vous utilisez bien la version Qt5 installée via Homebrew.
 
 
+# Utilisation des fichiers .fsd dans SavvyCAN
+
+SavvyCAN permet de charger des fichiers `.fsd` (Frame Send Data) afin d’envoyer automatiquement des trames CAN définies.
+
+Chaque ligne d’un fichier `.fsd` correspond à une trame et est composée des éléments suivants :
+```
+F#<Bus>#<ID>#<NomMessage>#<Len>#<Ext>#<Rem>#<Data...> #<Trigger>#<Modifications>#
+```
+
+---
+
+### 📂 Différence entre l’ancien et le nouveau modèle `.fsd`
+
+SavvyCAN a deux manières d’interpréter et stocker les trames dans les fichiers `.fsd` :
+
+#### 🔹 Ancien modèle (brut)
+```
+F#0#0x0CFF01BF#8#T#F#0x00 0x22 0x8A 0x00 0xFF 0x00 0x00 0x00 #200ms#neutral#
+```
+- Le champ **NomMessage** est vide → la 3e position après l’ID est directement utilisée pour la longueur (`8`).
+- L’utilisateur doit se fier uniquement à l’ID et aux données pour comprendre la signification de la trame.
+- Le champ **Modifications** contient souvent un mot-clé générique (`neutral`).
+
+#### 🔹 Nouveau modèle (customisé)
+```
+F#0#0x0CFF01BF#test##T#F#0x00 0x22 0x8C 0x00 0xFF 0x00 0x00 0x00 #100MS#test du custom#
+```
+- Le champ **NomMessage** est rempli (`test`) → permet d’identifier directement la fonction de la trame dans l’interface.
+- Le champ **Len** est vide (`##`) car SavvyCAN calcule automatiquement la longueur.
+- Le contenu des **données** peut être modifié (exemple : `0x8A → 0x8C`).
+- La fréquence d’envoi (**Trigger**) est paramétrée avec une valeur plus flexible (`200ms → 100MS`).
+- Le champ **Modifications** est libre et sert désormais à documenter la trame (`test du custom`).
+
+---
+
+👉 **En résumé** :
+- **Ancien modèle** = minimaliste, basé uniquement sur ID, longueur et données.
+- **Nouveau modèle** = enrichi, avec un champ `NomMessage` pour l’identification, un `Trigger` flexible et un champ `Modifications` documenté.  
