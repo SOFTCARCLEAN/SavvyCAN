@@ -164,7 +164,7 @@ void FrameSenderWindow::updatedFrames(int numFrames)
     else //just got some new frames. See if they are relevant.
     {
         if (numFrames > modelFrames->count()) return;
-        qDebug() << "New frames in sender window";
+        qDebug() << "New frames in sender window frame";
         //run through the supposedly new frames in order
         for (int i = modelFrames->count() - numFrames; i < modelFrames->count(); i++)
         {
@@ -557,7 +557,8 @@ void FrameSenderWindow::handleTick()
                     trigger->currCount++;
                     doModifiers(i);
                     updateGridRow(i);
-                    //qDebug() << "About to try to send a frame";
+                    qDebug() << sendingData[i].payload();
+                    qDebug() << "About to try to send a frame";
                     CANConManager::getInstance()->sendFrame(sendingData[i]);
                     if (trigger->ID > 0) trigger->readyCount = false; //reset flag if this is a timed ID trigger
                 }
@@ -951,7 +952,7 @@ ModifierOperationType FrameSenderWindow::parseOperation(QString op)
 /// <param name="idx"></param>
 void FrameSenderWindow::updateGridRow(int idx)
 {
-    //qDebug() << "updateGridRow";
+    qDebug() << "updateGridRow";
 
     inhibitChanged = true;
     FrameSendData *temp = &sendingData[idx];
@@ -1014,7 +1015,7 @@ void FrameSenderWindow::processCellChange(int line, int col)
     switch (col)
     {
         case ST_COLS::SENDTAB_COL_EN: //Enable check box
-            if (ui->tableSender->item(line, 0)->checkState() == Qt::Checked)
+            if (ui->tableSender->item(line, ST_COLS::SENDTAB_COL_EN)->checkState() == Qt::Checked)
             {
                 sendingData[line].enabled = true;
             }
@@ -1050,21 +1051,21 @@ void FrameSenderWindow::processCellChange(int line, int col)
             qDebug() << "setting ID to " << tempVal;
             break;
         case ST_COLS::SENDTAB_COL_LEN:
-            tempVal = Utility::ParseStringToNum(ui->tableSender->item(line, 3)->text());
+            tempVal = Utility::ParseStringToNum(ui->tableSender->item(line, ST_COLS::SENDTAB_COL_LEN)->text());
             if (tempVal < 0) tempVal = 0;
             if (tempVal > 8) tempVal = 8;            
             arr.resize(tempVal);
             sendingData[line].setPayload(arr);
             break;
         case ST_COLS::SENDTAB_COL_EXT:
-            if (ui->tableSender->item(line, 4)->checkState() == Qt::Checked) {
+            if (ui->tableSender->item(line, ST_COLS::SENDTAB_COL_EXT)->checkState() == Qt::Checked) {
                 sendingData[line].setExtendedFrameFormat(true);
             } else {
                 sendingData[line].setExtendedFrameFormat(false);
             }
             break;
         case ST_COLS::SENDTAB_COL_REM:
-            if (ui->tableSender->item(line, 5)->checkState() == Qt::Checked) {
+            if (ui->tableSender->item(line, ST_COLS::SENDTAB_COL_REM)->checkState() == Qt::Checked) {
                 sendingData[line].setFrameType(QCanBusFrame::RemoteRequestFrame);
             } else {
                 sendingData[line].setFrameType(QCanBusFrame::DataFrame);
