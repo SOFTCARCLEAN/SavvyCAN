@@ -557,7 +557,7 @@ void FrameSenderWindow::handleTick()
                     trigger->currCount++;
                     doModifiers(i);
                     updateGridRow(i);
-                    qDebug() << sendingData[i].payload();
+                    qDebug() << "payload : " << sendingData[i].payload();
                     qDebug() << "About to try to send a frame";
                     CANConManager::getInstance()->sendFrame(sendingData[i]);
                     if (trigger->ID > 0) trigger->readyCount = false; //reset flag if this is a timed ID trigger
@@ -589,7 +589,7 @@ void FrameSenderWindow::doModifiers(int idx)
 
     if (sendData->modifiers.count() == 0) return; //if no modifiers just leave right now
 
-    //qDebug() << "Executing mods";
+    qDebug() << "Executing mods";
 
     for (int i = 0; i < sendData->modifiers.count(); i++)
     {
@@ -706,7 +706,7 @@ void FrameSenderWindow::processModifierText(int line)
 
     //yeah, lots of operations on this one line but it's for a good cause. Removes the convenience English versions of the
     //logical operators and replaces them with the math equivs. Also uppercases and removes all superfluous whitespace
-    modString = ui->tableSender->item(line, 8)->text().toUpper().trimmed().replace("AND", "&").replace("XOR", "^").replace("OR", "|").replace(" ", "");
+    modString = ui->tableSender->item(line, ST_COLS::SENDTAB_COL_MODS)->text().toUpper().trimmed().replace("AND", "&").replace("XOR", "^").replace("OR", "|").replace(" ", "");
     if (modString != "")
     {
         QStringList mods = modString.split(',');
@@ -793,6 +793,8 @@ void FrameSenderWindow::processModifierText(int line)
 
             sendingData[line].modifiers.append(thisMod);
         }
+    }else {
+        sendingData[line].modifiers.clear();
     }
     //there is no else for the modifiers. We'll accept there not being any
 }
