@@ -64,13 +64,14 @@ jobs:
           arch: 'win64_mingw81'
           cache: true
 
+      - name: Install MinGW
+        run: choco install mingw --version=8.1.0 -y
+
+      - name: Add MinGW to PATH
+        run: echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin" >> $env:GITHUB_PATH
+
       - name: Install Inno Setup
         run: choco install innosetup -y
-
-      - name: Setup MinGW environment
-        run: |
-          setx PATH "C:\Qt\Tools\mingw810_64\bin;%PATH%"
-          echo "PATH updated to include MinGW"
 
       - name: Build Project
         run: |
