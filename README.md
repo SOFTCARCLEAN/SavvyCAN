@@ -308,3 +308,82 @@ F#0#0x0CFF01BF#test##T#F#0x00 0x22 0x8C 0x00 0xFF 0x00 0x00 0x00 #100MS#test du 
 👉 **En résumé** :
 - **Ancien modèle** = minimaliste, basé uniquement sur ID, longueur et données.
 - **Nouveau modèle** = enrichi, avec un champ `NomMessage` pour l’identification, un `Trigger` flexible et un champ `Modifications` documenté.  
+
+# 📝 Notes locales perso (setup Mac)
+
+Section perso pour se souvenir de ce qu'il faut sur la machine pour faire tourner ce projet, notamment après un "clean" du Mac.
+
+## Ce dont ce projet a besoin
+
+- **Xcode Command Line Tools** (compilateur `clang`) — vérifier avec `xcode-select -p`
+- **Homebrew** — https://brew.sh/ — vérifier avec `brew --version`
+- **CMake** — vérifier avec `cmake --version`
+- **Qt 5** (via `brew install qt@5`, formule *keg-only*) — vérifier avec `/opt/homebrew/opt/qt@5/bin/qmake --version`
+  - Modules Qt utilisés par le projet : `Core Gui Widgets SerialPort SerialBus Qml Test PrintSupport Network OpenGL Help`
+  - ⚠️ `qt@5` est marquée *deprecated* par Homebrew (dépréciation prévue mi-2027) mais fonctionne toujours.
+- Le `PATH` doit inclure `/opt/homebrew/opt/qt@5/bin` (ligne à avoir dans `~/.zshrc`) :
+  ```bash
+  export PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+  ```
+
+### Vérif rapide de l'état de la machine (aucune installation, juste des checks)
+
+```bash
+xcode-select -p
+brew --version
+cmake --version
+/opt/homebrew/opt/qt@5/bin/qmake --version
+```
+
+Si une de ces commandes échoue, c'est ce qui a été perdu lors du clean et qu'il faut réinstaller :
+
+```bash
+xcode-select --install          # si Xcode CLT manquant
+brew install cmake              # si cmake manquant
+brew install qt@5               # si Qt5 manquant
+```
+
+*(Ne pas lancer ces commandes sans vérifier d'abord — elles ne sont notées ici qu'à titre de mémo.)*
+
+## Comment lancer le projet
+
+### Option A — binaire déjà compilé (le plus rapide si `bin/SavvyCAN` existe déjà)
+
+```bash
+bin/SavvyCAN
+```
+
+### Option B — via le script de rebuild (CMake, recommandé)
+
+```bash
+./scripts/rebuild.sh
+```
+
+Ce script nettoie `cmake-build-debug/`, relance `cmake` + `make`, puis lance directement `bin/SavvyCAN`.
+
+### Option C — CMake à la main
+
+```bash
+rm -rf cmake-build-debug
+mkdir cmake-build-debug
+cd cmake-build-debug
+cmake ..
+make -j$(sysctl -n hw.ncpu)
+cd ..
+bin/SavvyCAN
+```
+
+### Option D — qmake (produit un bundle `SavvyCAN.app`)
+
+```bash
+/opt/homebrew/opt/qt@5/bin/qmake CONFIG+=sdk_no_version_check
+make
+open SavvyCAN.app
+# ou directement :
+./SavvyCAN.app/Contents/MacOS/SavvyCAN
+```
+
+## Repères importants
+
+- `CMakeLists.txt` pointe en dur vers `Qt5_DIR=/opt/homebrew/opt/qt@5/lib/cmake/Qt5` — si Homebrew change ce chemin un jour, c'est ici qu'il faut corriger.
+- Les dossiers `cmake-build-debug/`, `cmake-build-release/`, `bin/`, `.idea/`, `help/CMakeFiles/`, `help/CMakeCache.txt` sont des artefacts de build générés localement (non versionnés) — pas besoin de s'en inquiéter s'ils apparaissent dans `git status`.

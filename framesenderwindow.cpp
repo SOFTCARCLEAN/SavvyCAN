@@ -52,21 +52,28 @@ FrameSenderWindow::FrameSenderWindow(const QVector<CANFrame> *frames, QWidget *p
 void FrameSenderWindow::setupGrid()
 {
     QStringList headers;
-    headers << "En" << "Bus" << "ID" << "MsgName" << "Len" << "Ext" << "Rem" << "Data"
+    headers << "En" << "Bus" << "ID" << "MsgName" << "Description" << "Len" << "Ext" << "Rem" << "Data"
             << "Trigger" << "Modifications" << "Count";
-    ui->tableSender->setColumnCount(11);
+    ui->tableSender->setColumnCount(12);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_EN, 50);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_BUS, 50);
-    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_ID, 50);
-    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_MSGNAME, 150);
+    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_ID, 100);
+    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_MSGNAME, 280);
+    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_DESC, 150);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_LEN, 50);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_EXT, 50);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_REM, 50);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_DATA, 220);
-    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_TRIGGER, 270);
-    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_MODS, 270);
+    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_TRIGGER, 100);
+    ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_MODS, 220);
     ui->tableSender->setColumnWidth(ST_COLS::SENDTAB_COL_COUNT, 80);
     ui->tableSender->setHorizontalHeaderLabels(headers);
+    //let MsgName grow/shrink to fit whatever it's currently showing instead of a fixed width
+    ui->tableSender->horizontalHeader()->setSectionResizeMode(ST_COLS::SENDTAB_COL_ID, QHeaderView::ResizeToContents);
+    ui->tableSender->horizontalHeader()->setSectionResizeMode(ST_COLS::SENDTAB_COL_MSGNAME, QHeaderView::ResizeToContents);
+    ui->tableSender->horizontalHeader()->setSectionResizeMode(ST_COLS::SENDTAB_COL_DESC, QHeaderView::ResizeToContents);
+    ui->tableSender->horizontalHeader()->setSectionResizeMode(ST_COLS::SENDTAB_COL_DATA, QHeaderView::ResizeToContents);
+    ui->tableSender->horizontalHeader()->setSectionResizeMode(ST_COLS::SENDTAB_COL_MODS, QHeaderView::ResizeToContents);
 }
 
 FrameSenderWindow::~FrameSenderWindow()
@@ -374,12 +381,21 @@ void FrameSenderWindow::saveSenderFile(QString filename)
         else outString = "F#";
         for (int i = 1; i < ST_COLS::SENDTAB_COL_COUNT; i++)
         {
+            //the description column isn't a field of its own on disk - it's packed onto the
+            //end of the MsgName field (separated by a space) so old files stay compatible.
+            if (i == ST_COLS::SENDTAB_COL_DESC) continue;
+
             if (i == ST_COLS::SENDTAB_COL_EXT || i == ST_COLS::SENDTAB_COL_REM) {
                 if (ui->tableSender->item(c, i)->checkState() == Qt::Checked) {
                     outString.append("T");
                 } else {
                     outString.append("F");
                 }
+            } else if (i == ST_COLS::SENDTAB_COL_MSGNAME) {
+                QString name = ui->tableSender->item(c, i)->text();
+                QString desc = ui->tableSender->item(c, ST_COLS::SENDTAB_COL_DESC)->text();
+                if (!desc.isEmpty()) name.append(" ").append(desc);
+                outString.append(name);
             } else {
                 outString.append(ui->tableSender->item(c, i)->text());
             }
@@ -436,15 +452,59 @@ void FrameSenderWindow::loadSenderFile(QString filename)
             }
             else ui->tableSender->item(row, ST_COLS::SENDTAB_COL_EN)->setCheckState(Qt::Unchecked);
             if (tokens.length() >= 9) {
+                int tk = 1; //index into tokens[] - separate from the column index because
+                            //the description column doesn't have its own token on disk
+                //some older files use the Modifications field as a free-text label on rows
+                //that never got a real name (e.g. UDS request rows) - if we borrow it as the
+                //description below, the Modifications cell must come back empty so the note
+                //isn't shown twice and Modifications is free for its real purpose again.
+                bool modsBorrowedAsDesc = false;
                 for (int i = 1; i < ST_COLS::SENDTAB_COL_COUNT; i++)
                 {
-                    if (i != ST_COLS::SENDTAB_COL_EXT && i != ST_COLS::SENDTAB_COL_REM) {
-                        ui->tableSender->setItem(row, i, new QTableWidgetItem(QString(tokens[i])));
+                    if (i == ST_COLS::SENDTAB_COL_DESC) continue;
+
+                    if (i == ST_COLS::SENDTAB_COL_MSGNAME) {
+                        QString raw = QString(tokens[tk]).trimmed();
+                        quint32 idVal = (quint32)Utility::ParseStringToNum(QString(tokens[2]));
+                        QString msgName, desc;
+                        if (idVal == 0) {
+                            //ID 0x00000000 marks a visual separator row (e.g. "----TEST----"),
+                            //not a real frame - keep the label whole, don't try to split it.
+                            msgName = raw;
+                        } else if (!raw.isEmpty()) {
+                            //name and description are packed together on disk as "Name Description",
+                            //separated by the first space - but only when the leading word looks
+                            //like a real identifier (contains an underscore, e.g. can_frm_BMS_STATUS).
+                            //Plain multi-word labels like "force lock" or "BMS Mode Request" have no
+                            //such prefix and must not be chopped on their first word.
+                            int spaceIdx = raw.indexOf(' ');
+                            if (spaceIdx < 0) {
+                                msgName = raw;
+                            } else {
+                                QString candidate = raw.left(spaceIdx);
+                                if (candidate.contains('_')) {
+                                    msgName = candidate;
+                                    desc = raw.mid(spaceIdx + 1).trimmed();
+                                } else {
+                                    desc = raw;
+                                }
+                            }
+                        } else if (tokens.length() > 9 && !QString(tokens[9]).trimmed().isEmpty()) {
+                            desc = QString(tokens[9]).trimmed();
+                            modsBorrowedAsDesc = true;
+                        }
+                        ui->tableSender->setItem(row, ST_COLS::SENDTAB_COL_MSGNAME, new QTableWidgetItem(msgName));
+                        ui->tableSender->setItem(row, ST_COLS::SENDTAB_COL_DESC, new QTableWidgetItem(desc));
+                    } else if (i == ST_COLS::SENDTAB_COL_MODS && modsBorrowedAsDesc) {
+                        ui->tableSender->setItem(row, i, new QTableWidgetItem(QString()));
+                    } else if (i != ST_COLS::SENDTAB_COL_EXT && i != ST_COLS::SENDTAB_COL_REM) {
+                        ui->tableSender->setItem(row, i, new QTableWidgetItem(QString(tokens[tk])));
                     } else {
-                        if (tokens[i] == "T") {
+                        if (tokens[tk] == "T") {
                             ui->tableSender->item(row, i)->setCheckState(Qt::Checked);
                         }
                     }
+                    tk++;
                 }
             } else {
                 ui->tableSender->setItem(row, ST_COLS::SENDTAB_COL_BUS, new QTableWidgetItem(QString(tokens[1])));
